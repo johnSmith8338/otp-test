@@ -1,9 +1,35 @@
 @let code = codeControl;
 <div class="form-wrapper">
     <a href="#" [routerLink]="['/']" class="back">back</a>
-    <form action="" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <label for="code">Enter OTP:</label>
-        <input type="text" id="code" formControlName="code" maxlength="6"/>
+    <form action="" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="one-time-code" class="otp-form">
+        <label for="otp">Enter OTP:</label>
+        <div class="otp-box" (click)="focusInput()">
+            <div class="otp-digit" *ngFor="let i of [0,1,2,3,4,5]; let idx=index">
+                @if(idx < codeLength){
+                    {{codeValue[idx]}}
+                }@else if (idx===codeLength && isFocused()) {
+                    <span class="cursor"></span>
+                }@else {
+                    &nbsp;
+                }
+            </div>
+        </div>
+        <div class="otp-inputs">
+            <input 
+                #realInput
+                type="text" 
+                id="otp" 
+                formControlName="code"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="6"
+                autocomplete="one-time-code"
+                class="real-input"
+                (input)="onInput()"
+                (focus)="isFocused.set(true)"
+                (blur)="isFocused.set(false)"
+            />
+        </div>
         @if (code && code.touched && code.errors) {
         <div class="error">
             @if (code.errors['required']) {

@@ -10,3 +10,46 @@ form {
 .back {
   margin-block-end: 4rem;
 }
+
+.otp-box {
+  display: flex;
+  gap: 8px;
+}
+
+.otp-digit {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-bottom: 2px solid rgba(#000000, 0.4);
+  font-weight: 600;
+  font-size: 1.25rem;
+  cursor: text;
+}
+
+.real-input {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.25rem;
+  background: blue;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
