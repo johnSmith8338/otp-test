@@ -71,7 +71,6 @@ export class OtpComponent implements AfterViewInit {
   }
 
   onSubmit() {
-    console.log('submited')
     this.form.markAllAsTouched();
 
     if (!this.form.valid) {
@@ -79,9 +78,21 @@ export class OtpComponent implements AfterViewInit {
       return;
     }
 
-    const codeValue = this.codeControl?.value ?? '';
-    this.error.set(null);
+    // const codeValue = this.codeControl?.value ?? '';
+    // this.error.set(null);
 
-    alert(`OTP accepted! ${codeValue}`);
+    // alert(`OTP accepted! ${codeValue}`);
+
+    const enteredCode = this.codeControl?.value ?? '';
+    const savedOtp = localStorage.getItem('otp');
+
+    if (enteredCode === savedOtp) {
+      alert('OTP accepted!');
+      localStorage.removeItem('otp');
+      localStorage.removeItem('email');
+      // Link could be inserted for navigation after success
+    } else {
+      this.error.set('Incorrect OTP code. Please try again.');
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,6 +18,7 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private http = inject(HttpClient);
 
   form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]]
@@ -37,7 +39,21 @@ export class LoginComponent {
   onSubmit() {
     if (this.form.valid) {
       const email = this.form.get('email')?.value ?? '';
-      this.router.navigate(['/otp']);
+      // this.router.navigate(['/otp']);
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      this.http.post('http://localhost:3000/send-otp', { email, otp }).subscribe({
+        next: () => {
+          console.log('OTP sent');
+          localStorage.setItem('otp', otp);
+          localStorage.setItem('email', email);
+          this.router.navigate(['/otp']);
+        },
+        error: () => {
+          alert('Send OTP - rejected');
+        }
+      })
     }
   }
 }
