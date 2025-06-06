@@ -29,19 +29,6 @@ export class OtpComponent implements AfterViewInit {
   isFocused = signal(false);
   @ViewChild('realInput') realInput!: ElementRef<HTMLInputElement>;
 
-  constructor() {
-    this.form.statusChanges.pipe(
-      takeUntilDestroyed()
-    ).subscribe(() => {
-      this.isValid.set(this.form.valid);
-    })
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.error()) {
-        this.error.set(null);
-      }
-    });
-  }
-
   get codeControl() {
     return this.form.get('code');
   }
@@ -50,6 +37,23 @@ export class OtpComponent implements AfterViewInit {
   }
   get codeLength() {
     return (this.codeControl?.value ?? '').length;
+  }
+
+  constructor() {
+    this.form.statusChanges.pipe(
+      takeUntilDestroyed()
+    ).subscribe(() => {
+      this.isValid.set(this.form.valid);
+    })
+    this.codeControl?.valueChanges.pipe(
+      takeUntilDestroyed()
+    ).subscribe((value: string | null) => {
+      const current = value ?? '';
+      this.isValid.set(this.form.valid);
+      if (current.length === 6 && this.form.valid) {
+        this.onSubmit();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -63,10 +67,11 @@ export class OtpComponent implements AfterViewInit {
   onInput() {
     const raw = this.codeControl?.value ?? '';
     const clean = raw.replace(/\D/g, '').slice(0, 6);
-    this.codeControl?.setValue(clean, { emitEvent: false });
+    this.codeControl?.setValue(clean);
   }
 
   onSubmit() {
+    console.log('submited')
     this.form.markAllAsTouched();
 
     const codeValue = this.codeControl?.value ?? '';
