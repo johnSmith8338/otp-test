@@ -74,9 +74,14 @@ export class OtpComponent implements AfterViewInit {
     console.log('submited')
     this.form.markAllAsTouched();
 
-    const codeValue = this.codeControl?.value ?? '';
+    if (!this.form.valid) {
+      this.error.set('Invalid OTP code. Please try again.');
+      return;
+    }
 
-    if (!this.form.valid) return;
+    const codeValue = this.codeControl?.value ?? '';
+    this.error.set(null);
+
     alert(`OTP accepted! ${codeValue}`);
   }
 }
