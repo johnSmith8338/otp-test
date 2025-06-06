@@ -1,11 +1,19 @@
+@let code = codeControl;
 <div class="form-wrapper">
     <a href="#" [routerLink]="['/']" class="back">back</a>
     <form action="" [formGroup]="form" (ngSubmit)="onSubmit()">
         <label for="code">Enter OTP:</label>
         <input type="text" id="code" formControlName="code" maxlength="6"/>
-        <button type="submit" [disabled]="!isValid()">Verify</button>
-        @if (error()) {
-            <div class="error">{{error()}}</div>
+        @if (code && code.touched && code.errors) {
+        <div class="error">
+            @if (code.errors['required']) {
+            Code is required.
+            } @else if (code.errors['minlength'] || code.errors['maxlength']) {
+            Code must be 6 digits.
+            }
+        </div>
         }
+        <button type="submit" [disabled]="!isValid()">Verify</button>
+        <button type="reset" class="reset">Reset field</button>
     </form>
 </div>

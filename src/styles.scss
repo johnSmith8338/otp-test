@@ -13,10 +13,28 @@ input,
 button {
     font-size: 1rem;
     padding: 8px 24px;
+    border-radius: 8px;
+    border-color: rgba(#000000, 0.4);
+    outline-offset: 4px;
+    outline-color: blue;
+}
+
+button:not([disabled]) {
+    cursor: pointer;
 }
 
 .form-wrapper {
     display: grid;
     place-content: center;
     height: 100vh;
+}
+
+.error {
+    color: red;
+    font-size: 0.75rem;
+    margin-block-start: -0.5rem;
+}
+
+.outline {
+    background: transparent;
 }

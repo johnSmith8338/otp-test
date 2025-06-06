@@ -31,18 +31,24 @@ export class OtpComponent {
     ).subscribe(() => {
       this.isValid.set(this.form.valid);
     })
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.error()) {
+        this.error.set(null);
+      }
+    });
+  }
+
+  get codeControl() {
+    return this.form.get('code');
   }
 
   onSubmit() {
-    const codeValue = this.form.get('code')?.value ?? '';
+    this.form.markAllAsTouched();
+
+    const codeValue = this.codeControl?.value ?? '';
     this.code.set(codeValue);
 
-    if (!this.form.valid) {
-      this.error.set('Invalid OTP code. Please try again.');
-      return;
-    }
-
-    this.error.set(null);
-    alert('OTP accepted!');
+    if (!this.form.valid) return;
+    alert(`OTP accepted! ${codeValue}`);
   }
 }
