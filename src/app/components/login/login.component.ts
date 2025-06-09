@@ -36,9 +36,13 @@ export class LoginComponent {
     });
   }
 
+  get emailControl() {
+    return this.form.get('email');
+  }
+
   onSubmit() {
     if (this.form.valid) {
-      const email = this.form.get('email')?.value ?? '';
+      const email = this.emailControl?.value ?? '';
       // this.router.navigate(['/otp']);
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();

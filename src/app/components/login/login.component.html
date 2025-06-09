@@ -1,7 +1,15 @@
+@let email=emailControl;
 <div class="form-wrapper">
     <form action="" [formGroup]="form" (ngSubmit)="onSubmit()">
         <label for="email">Email:</label>
         <input type="email" id="email" formControlName="email"/>
+        @if (email && email.touched && email.errors) {
+        <div class="error">
+            @if (email.errors['required']) {
+            Code is required.
+            }
+        </div>
+        }
         <button type="submit" [disabled]="!isValid()">Send Password</button>
     </form>
 </div>
