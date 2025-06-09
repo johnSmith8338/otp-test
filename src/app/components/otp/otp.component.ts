@@ -36,7 +36,7 @@ export class OtpComponent implements AfterViewInit, OnDestroy {
   isFocused = signal(false);
   @ViewChild('realInput') realInput!: ElementRef<HTMLInputElement>;
 
-  readonly timerDuration = 6;
+  readonly timerDuration = 30;
   readonly resendLimit = 3;
   timerSeconds = signal(this.timerDuration);
   canResend = signal(false);

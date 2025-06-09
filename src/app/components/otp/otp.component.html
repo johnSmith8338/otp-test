@@ -4,7 +4,7 @@
     <form action="" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="one-time-code" class="otp-form">
         <div class="entered-email">
             <p>Your Email:</p>
-            <p class="email">{{email()}}</p>
+            <p class="email">{{email()||'Enter your email'}} <a *ngIf="email()===''" href="#" [routerLink]="['/']">link</a></p>
         </div>
         <label for="otp">Enter OTP:</label>
         <div class="otp-box" (click)="focusInput()" [class.focused]="isFocused()">
@@ -57,7 +57,7 @@
         @if(!canResend() && resendAttempts() < resendLimit){
             <p class="timer">You can resend OTP in <strong>{{timerSeconds() | timerFormat}}</strong></p>
         }@else {
-            <button type="button" class="resend" (click)="resendOtp()">Resend OTP / <b>{{ resendLimit - resendAttempts() }}</b></button>
+            <button type="button" class="link" (click)="resendOtp()">Resend OTP / <b>{{ resendLimit - resendAttempts() }}</b></button>
         }
     </form>
 </div>
