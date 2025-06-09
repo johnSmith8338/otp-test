@@ -2,8 +2,12 @@
 <div class="form-wrapper">
     <a href="#" [routerLink]="['/']" class="back">back</a>
     <form action="" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="one-time-code" class="otp-form">
+        <div class="entered-email">
+            <p>Your Email:</p>
+            <p class="email">{{email()}}</p>
+        </div>
         <label for="otp">Enter OTP:</label>
-        <div class="otp-box" (click)="focusInput()">
+        <div class="otp-box" (click)="focusInput()" [class.focused]="isFocused()">
             <div class="otp-digit" *ngFor="let i of [0,1,2,3,4,5]; let idx=index">
                 @if(idx < codeLength){
                     {{codeValue[idx]}}
@@ -38,6 +42,11 @@
             Code must be 6 digits.
             }
         </div>
+        }
+        @if(error()){
+            <div class="error">
+                <span>{{error()}}</span>
+            </div>
         }
         <button type="submit" [disabled]="!isValid()">Verify</button>
         <button type="reset" class="outline">Reset field</button>

@@ -11,9 +11,31 @@ form {
   margin-block-end: 4rem;
 }
 
+.entered-email {
+  p {
+    margin: 0;
+    margin-block-start: 0.25rem;
+  }
+}
+
+.email {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
 .otp-box {
   display: flex;
   gap: 8px;
+
+  &.focused {
+    outline: 2px solid blue;
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+}
+
+label {
+  margin-block-start: 1rem;
 }
 
 .otp-digit {
@@ -38,6 +60,7 @@ form {
   background: transparent;
   color: transparent;
   caret-color: transparent;
+  box-sizing: border-box;
 }
 
 .cursor {

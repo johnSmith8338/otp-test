@@ -24,6 +24,7 @@ export class OtpComponent implements AfterViewInit {
   });
 
   code = computed(() => this.form.get('code')?.value ?? '');
+  email = signal('');
   error = signal<string | null>(null);
   isValid = signal(this.form.valid);
   isFocused = signal(false);
@@ -40,6 +41,9 @@ export class OtpComponent implements AfterViewInit {
   }
 
   constructor() {
+    const savedEmail = localStorage.getItem('email');
+    this.email.set(savedEmail ?? '');
+
     this.form.statusChanges.pipe(
       takeUntilDestroyed()
     ).subscribe(() => {
@@ -73,10 +77,10 @@ export class OtpComponent implements AfterViewInit {
   onSubmit() {
     this.form.markAllAsTouched();
 
-    if (!this.form.valid) {
-      this.error.set('Invalid OTP code. Please try again.');
-      return;
-    }
+    // if (!this.form.valid) {
+    //   this.error.set('Invalid OTP code. Please try again.');
+    //   return;
+    // }
 
     // const codeValue = this.codeControl?.value ?? '';
     // this.error.set(null);
@@ -90,6 +94,7 @@ export class OtpComponent implements AfterViewInit {
       alert('OTP accepted!');
       localStorage.removeItem('otp');
       localStorage.removeItem('email');
+      this.error.set(null);
       // Link could be inserted for navigation after success
     } else {
       this.error.set('Incorrect OTP code. Please try again.');
