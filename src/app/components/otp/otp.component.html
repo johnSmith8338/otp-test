@@ -47,8 +47,17 @@
             <div class="error">
                 <span>{{error()}}</span>
             </div>
+        }@else if(resendAttempts() >= resendLimit){
+            <div class="error">
+                <span>{{error()}}</span>
+            </div>
         }
         <button type="submit" [disabled]="!isValid()">Verify</button>
         <button type="reset" class="outline">Reset field</button>
+        @if(!canResend() && resendAttempts() < resendLimit){
+            <p class="timer">You can resend OTP in <strong>{{timerSeconds() | timerFormat}}</strong></p>
+        }@else {
+            <button type="button" class="resend" (click)="resendOtp()">Resend OTP / <b>{{ resendLimit - resendAttempts() }}</b></button>
+        }
     </form>
 </div>

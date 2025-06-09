@@ -1,8 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, OnDestroy, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TimerFormatPipe } from '../../pipes/timer-format.pipe';
+import { interval, Subscription } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-otp',
@@ -11,13 +14,16 @@ import { RouterLink } from '@angular/router';
     ReactiveFormsModule,
     RouterLink,
     CommonModule,
+    TimerFormatPipe,
   ],
   templateUrl: './otp.component.html',
   styleUrl: './otp.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OtpComponent implements AfterViewInit {
+export class OtpComponent implements AfterViewInit, OnDestroy {
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
+  private http = inject(HttpClient);
 
   form = this.fb.group({
     code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
@@ -29,6 +35,13 @@ export class OtpComponent implements AfterViewInit {
   isValid = signal(this.form.valid);
   isFocused = signal(false);
   @ViewChild('realInput') realInput!: ElementRef<HTMLInputElement>;
+
+  readonly timerDuration = 6;
+  readonly resendLimit = 3;
+  timerSeconds = signal(this.timerDuration);
+  canResend = signal(false);
+  resendAttempts = signal(0);
+  private timerSub!: Subscription;
 
   get codeControl() {
     return this.form.get('code');
@@ -58,10 +71,15 @@ export class OtpComponent implements AfterViewInit {
         this.onSubmit();
       }
     });
+
+    this.startTimer();
   }
 
   ngAfterViewInit(): void {
-    queueMicrotask(() => this.focusInput());
+    queueMicrotask(() => {
+      this.focusInput();
+      this.startTimer();
+    });
   }
 
   focusInput() {
@@ -99,5 +117,48 @@ export class OtpComponent implements AfterViewInit {
     } else {
       this.error.set('Incorrect OTP code. Please try again.');
     }
+  }
+
+  private startTimer() {
+    this.canResend.set(false);
+    this.timerSeconds.set(this.timerDuration);
+
+    if (this.timerSub) this.timerSub.unsubscribe();
+
+    this.timerSub = interval(1000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const current = this.timerSeconds() - 1;
+        this.timerSeconds.set(current);
+        if (current <= 0) {
+          this.timerSub.unsubscribe();
+          this.canResend.set(true);
+        }
+      });
+  }
+
+  resendOtp() {
+    if (this.resendAttempts() >= this.resendLimit) {
+      this.error.set("You've reached the maximum number of resend attempts");
+      return;
+    }
+
+    const email = localStorage.getItem('email');
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    this.http.post('http://localhost:3000/send-otp', { email, otp: newOtp }).subscribe({
+      next: () => {
+        localStorage.setItem('otp', newOtp);
+        this.resendAttempts.set(this.resendAttempts() + 1);
+        this.startTimer();
+      },
+      error: () => {
+        this.error.set('Failed to resend OTP');
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.timerSub?.unsubscribe();
   }
 }

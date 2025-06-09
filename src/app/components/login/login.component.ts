@@ -45,7 +45,6 @@ export class LoginComponent {
 
       this.http.post('http://localhost:3000/send-otp', { email, otp }).subscribe({
         next: () => {
-          console.log('OTP sent');
           localStorage.setItem('otp', otp);
           localStorage.setItem('email', email);
           this.router.navigate(['/otp']);
